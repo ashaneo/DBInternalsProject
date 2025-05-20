@@ -3,8 +3,11 @@ from rich.table import Table
 from rich import print
 from db.parser   import parse
 from db.executor import execute
+from db.txn.recovery import recover
 from db.txn.flush_worker import start as start_flush
-start_flush()
+
+start_flush(interval=0.5)
+recover()
 
 def show(rows):
     if not rows: print("(no rows)"); return

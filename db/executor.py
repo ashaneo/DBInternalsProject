@@ -24,18 +24,35 @@ def execute(ast:Dict)->List[Dict]|None:
     global _current_txn
     t=ast["type"]
 
-    if t=="BEGIN":
-        _current_txn=Transaction(fast=False); return
+    # if t=="BEGIN": #ACID
+    #     _current_txn=Transaction(fast=False); return
+    if t == "BEGIN":
+        fast = ast["mode"] == "FAST"
+        _current_txn = Transaction(fast=fast)
+        return
 
     if t=="COMMIT":
         if _current_txn: _current_txn.commit(); _current_txn=None
         return
 
-    if t=="CREATE":
-        create_table(ast["table"], ast["columns"], ast["pk"]); return
+    # if t=="CREATE":
+    #     create_table(ast["table"], ast["columns"], ast["pk"]); return
+    
+    if t == "CREATE":
+    # DDL must NEVER run inside a FAST txn – force SAFE
+        if _current_txn and _current_txn.fast:
+            raise ValueError("DDL must be SAFE; restart transaction with BEGIN SAFE;")
+        create_table(ast["table"], ast["columns"], ast["pk"])
+        return          # <── important!  prevents fall-through
 
-    if t=="DROP":
-        drop_table(ast["table"]); return
+    if t == "DROP":
+        if _current_txn and _current_txn.fast:
+            raise ValueError("DDL must be SAFE; restart transaction with BEGIN SAFE;")
+        drop_table(ast["table"])
+        return
+
+    # if t=="DROP":
+    #     drop_table(ast["table"]); return
 
     if t == "INSERT":
         schema = load()

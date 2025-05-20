@@ -17,11 +17,18 @@
         "users": {
             "columns": [
                 "id",
-                "name",
-                "age",
-                "email"
+                "name"
             ],
             "primary_key": "id"
+        },
+        "products": {
+            "columns": [
+                "prod_id",
+                "title",
+                "price",
+                "in_stock"
+            ],
+            "primary_key": "prod_id"
         }
     }
 }

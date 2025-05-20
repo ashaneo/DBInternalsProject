@@ -6,7 +6,8 @@ INSERT = re.compile(r"INSERT\s+INTO\s+(\w+)\s+VALUES\s*\((.+)\);?", re.I | re.S)
 DELETE = re.compile(r"DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*=\s*(.+);?", re.I)
 DROP   = re.compile(r"DROP\s+TABLE\s+(\w+);?", re.I)
 SELECT = re.compile(r"SELECT\s+\*\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)\s*=\s*(.+))?;?", re.I)
-BEGIN  = re.compile(r"BEGIN;?", re.I)
+# BEGIN  = re.compile(r"BEGIN;?", re.I)
+BEGIN = re.compile(r"BEGIN(?:\s+(FAST|SAFE))?;?", re.I)
 COMMIT = re.compile(r"COMMIT;?", re.I)
 
 def _split_vals(blob:str):
@@ -22,7 +23,10 @@ def _split_vals(blob:str):
 
 def parse(sql:str)->dict|None:
     sql=sql.strip()
-    if m:=BEGIN.fullmatch(sql):  return {"type":"BEGIN"}
+    # if m:=BEGIN.fullmatch(sql):  return {"type":"BEGIN"} #ACID
+    if m := BEGIN.fullmatch(sql): #Eventual
+        mode = (m.group(1) or "SAFE").upper()
+        return {"type": "BEGIN", "mode": mode}
     if m:=COMMIT.fullmatch(sql): return {"type":"COMMIT"}
     if m:=CREATE.fullmatch(sql):
         t,c,pk=m.groups(); return {"type":"CREATE","table":t,
