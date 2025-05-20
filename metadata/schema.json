@@ -1,0 +1,27 @@
+{
+    "tables": {
+        "t": {
+            "columns": [
+                "id",
+                "name"
+            ],
+            "primary_key": "id"
+        },
+        "tt": {
+            "columns": [
+                "id",
+                "name"
+            ],
+            "primary_key": "id"
+        },
+        "users": {
+            "columns": [
+                "id",
+                "name",
+                "age",
+                "email"
+            ],
+            "primary_key": "id"
+        }
+    }
+}
