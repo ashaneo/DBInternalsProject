@@ -29,8 +29,16 @@ def parse(sql:str)->dict|None:
                                    "columns":[x.strip()for x in c.split(",")],"pk":pk}
     if m:=INSERT.fullmatch(sql):
         t,vals=m.groups(); return {"type":"INSERT","table":t,"values":_split_vals(vals)}
-    if m:=DELETE.fullmatch(sql):
-        t,f,v=m.groups(); return {"type":"DELETE","table":t,"field":f,"value":ast.literal_eval(v)}
+    if m := DELETE.fullmatch(sql):
+        t, f, v = m.groups()
+        v = v.rstrip(" ;")              # <-- strip spaces & trailing semicolon
+        return {"type": "DELETE",
+                "table": t,
+                "field": f,
+                "value": ast.literal_eval(v)}
+
+    # if m:=DELETE.fullmatch(sql):
+    #     t,f,v=m.groups(); return {"type":"DELETE","table":t,"field":f,"value":ast.literal_eval(v)}
     if m:=DROP.fullmatch(sql):   return {"type":"DROP","table":m.group(1)}
     if m:=SELECT.fullmatch(sql):
         t,f,v=m.groups()

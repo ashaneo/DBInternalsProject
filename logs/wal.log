@@ -4,3 +4,5 @@
 {"ts": 1747752210.3618305, "type": "COMMIT", "id": 1}
 {"ts": 1747758626.5501673, "type": "BEGIN", "id": 1}
 {"ts": 1747758631.9990177, "type": "ACTION", "id": 1, "data": {"op": "INSERT", "table": "users", "row": {"id": 99, "name": "Crash", "age": 0, "email": "x"}}}
+{"ts": 1747758826.452637, "type": "BEGIN", "id": 1}
+{"ts": 1747758832.0873492, "type": "ACTION", "id": 1, "data": {"op": "INSERT", "table": "users", "row": {"id": 1, "name": "Alice", "age": 30, "email": "alice@mail"}}}

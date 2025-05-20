@@ -37,14 +37,21 @@ def execute(ast:Dict)->List[Dict]|None:
     if t=="DROP":
         drop_table(ast["table"]); return
 
-    if t=="INSERT":
-        schema=load(); cols=schema["tables"][ast["table"]]["columns"]
-        row=dict(zip(cols, ast["values"]))
-        if _current_txn: _current_txn.action("INSERT", row)
-        append_row(ast["table"], row); return
-        # if _current_txn:
-        #     _current_txn.action("INSERT",
-        #         {"table": ast["table"], "row": row})
+    if t == "INSERT":
+        schema = load()
+        cols   = schema["tables"][ast["table"]]["columns"]
+
+        if len(cols) != len(ast["values"]):
+            raise ValueError("column / value count mismatch")
+
+        row = dict(zip(cols, ast["values"]))
+
+        if _current_txn:
+            _current_txn.action("INSERT",
+                {"op": "INSERT", "table": ast["table"], "row": row})
+
+        append_row(ast["table"], row)
+        return
 
     if t=="DELETE":
         pk=load()["tables"][ast["table"]]["primary_key"]
